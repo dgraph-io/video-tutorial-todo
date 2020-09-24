@@ -6,11 +6,36 @@ import TodoFooter from './TodoFooter'
 import TodoItem from './TodoItem'
 const ENTER_KEY = 13
 
+const QUERY_TASK =  gql`
+{
+  queryTask {
+    id
+    title
+  }
+}
+`;
+
 const TodoApp = () => {
   const [nowShowing, setNowShowing] = useState(defs.ALL_TODOS);
   const [getEditing, setEditing] = useState(null);
   const [newTodo, setNewTodo] = useState("");
   const [shownTodos, setShownTodos] = useState([]);
+
+  const { loading, error, data } = useQuery(QUERY_TASK);
+  useEffect(() => setShownTodos(loading? [] : data.queryTask), [data]);
+
+  const [addTask] = useMutation(
+    gql`
+    mutation addTask($title: String!) {
+      addTask(input: [{ title: $title, completed: false, user: { username: "example@dgraph.io" } }]) {
+        task {
+          id
+          title
+        } 
+      }
+    }
+    `
+  );
   
   const handleChange = event => {
     setNewTodo(event.target.value)
@@ -29,7 +54,10 @@ const TodoApp = () => {
   }
 
   const add = (title) => {
-    // add ADD mutation here
+    addTask({
+      variables: { title },
+      refetchQueries: [{ query: QUERY_TASK }]
+    })
   }
 
   const destroy = todo => {

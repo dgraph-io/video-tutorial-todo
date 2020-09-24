@@ -9,7 +9,7 @@ import history from "./history";
 import './App.css';
 
 const client = new ApolloClient({
-  uri: 'YOUR_ENDPOINT_HERE',
+  uri: 'https://acceptable-fly-836.us-west-2.aws.cloud.dgraph.io/graphql',
   cache: new InMemoryCache()
 })
 
